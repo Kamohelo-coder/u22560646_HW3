@@ -1,0 +1,122 @@
+﻿@model u22560646_HW3.Models.HomeViewModel
+@{
+    ViewBag.Title = "Staff";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm h-100">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <strong>Staff</strong>
+            <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#createStaffModal">
+                Create
+            </button>
+        </div>
+
+        <div class="card-body p-0">
+            @if (Model.PagedStaffs != null && Model.PagedStaffs.Any())
+            {
+                <table class="table table-sm table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var s in Model.PagedStaffs)
+                        {
+                            <tr>
+                                <td>@s.FirstName @s.LastName</td>
+                                <td>@s.Email</td>
+                                <td>@s.Phone</td>
+                                
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p class="p-3 text-muted">No staff found.</p>
+            }
+        </div>
+
+        <!-- STAFF PAGINATION -->
+        <nav aria-label="Staff pagination" class="mt-2">
+            <ul class="pagination pagination-sm justify-content-center mb-0">
+                @{
+                    int current = ViewBag.StaffPage;
+                    int total = Model.PagedStaffs.PageCount;
+                    int start = Math.Max(1, current - 2);
+                    int end = Math.Min(total, current + 2);
+                }
+
+                @if (current > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Staff", new { staffPage = 1 })">&laquo;</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Staff", new { staffPage = current - 1 })">&lt;</a>
+                    </li>
+                }
+
+                @if (start > 1)
+                {
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                }
+
+                @for (int i = start; i <= end; i++)
+                {
+                    <li class="page-item @(i == current ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Staff", new { staffPage = i })">@i</a>
+                    </li>
+                }
+
+                @if (end < total)
+                {
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                }
+
+                @if (current < total)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Staff", new { staffPage = current + 1 })">&gt;</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Staff", new { staffPage = total })">&raquo;</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<!-- CREATE STAFF MODAL -->
+<div class="modal fade" id="createStaffModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            @using (Html.BeginForm("CreateStaff", "Home", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Staff</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    @Html.TextBox("FirstName", null, new { @class = "form-control mb-2", placeholder = "First Name" })
+                    @Html.TextBox("LastName", null, new { @class = "form-control mb-2", placeholder = "Last Name" })
+                    @Html.TextBox("Email", null, new { @class = "form-control mb-2", placeholder = "Email" })
+                    @Html.TextBox("Phone", null, new { @class = "form-control mb-2", placeholder = "Phone" })
+                    @Html.DropDownList("StoreId", new SelectList(Model.Stores, "StoreId", "StoreName"), "Select Store", new { @class = "form-select" })
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>

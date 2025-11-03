@@ -1,0 +1,466 @@
+﻿@model u22560646_HW3.Models.HomeViewModel
+@{
+    ViewBag.Title = "Maintain";
+}
+
+<div class="container mt-4">
+    <h2 class="text-center fw-bold mb-4">Maintain</h2>
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Message"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- STAFF -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <select class="form-select form-select-sm w-auto">
+                        <option>Staff list</option>
+                    </select>
+                    <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#createStaffModal">Add</button>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.PagedStaffs.Any())
+                    {
+                        foreach (var s in Model.PagedStaffs)
+                        {
+                            <div class="border-bottom p-3">
+                                <strong>@s.FirstName @s.LastName</strong><br />
+                                <small class="text-muted">@s.Email | @s.Phone</small><br />
+                                <small>@(s.Store?.StoreName ?? "—")</small>
+
+                                <div class="mt-2">
+                                    <button class="btn btn-sm btn-outline-primary"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editStaffModal_@s.StaffId">
+                                        Edit
+                                    </button>
+
+                                    @using (Html.BeginForm("DeleteStaff", "Maintain", FormMethod.Post, new { onsubmit = "return confirm('Delete this staff?');", @class = "d-inline" }))
+                                    {
+                                        @Html.AntiForgeryToken()
+                                        @Html.Hidden("staffId", s.StaffId)
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="p-3 text-muted">No staff found.</p>
+                    }
+                </div>
+
+                <!-- STAFF PAGINATION -->
+                <nav aria-label="Staff pagination" class="mt-2">
+                    <ul class="pagination pagination-sm justify-content-center mb-0">
+                        @{
+                            int current = ViewBag.StaffPage;
+                            int total = Model.PagedStaffs.PageCount;
+                            int start = Math.Max(1, current - 2);
+                            int end = Math.Min(total, current + 2);
+                        }
+
+                        @if (current > 1)
+                        {
+                            <li class="page-item"><a class="page-link" href="@Url.Action("Index", new { staffPage = 1, custPage = ViewBag.CustPage, prodPage = ViewBag.ProdPage })">&laquo;</a></li>
+                            <li class="page-item"><a class="page-link" href="@Url.Action("Index", new { staffPage = current - 1, custPage = ViewBag.CustPage, prodPage = ViewBag.ProdPage })">&lt;</a></li>
+                        }
+
+                        @if (start > 1)
+                        {
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        }
+
+                        @for (int i = start; i <= end; i++)
+                        {
+                            <li class="page-item @(i == current ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Index", new { staffPage = i, custPage = ViewBag.CustPage, prodPage = ViewBag.ProdPage })">@i</a>
+                            </li>
+                        }
+
+                        @if (end < total)
+                        {
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        }
+
+                        @if (current < total)
+                        {
+                            <li class="page-item"><a class="page-link" href="@Url.Action("Index", new { staffPage = current + 1, custPage = ViewBag.CustPage, prodPage = ViewBag.ProdPage })">&gt;</a></li>
+                            <li class="page-item"><a class="page-link" href="@Url.Action("Index", new { staffPage = total, custPage = ViewBag.CustPage, prodPage = ViewBag.ProdPage })">&raquo;</a></li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- CUSTOMERS -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <select class="form-select form-select-sm w-auto">
+                        <option>Customer list</option>
+                    </select>
+                    <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#createCustomerModal">Add</button>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.PagedCustomers.Any())
+                    {
+                        foreach (var c in Model.PagedCustomers)
+                        {
+                            <div class="border-bottom p-3">
+                                <strong>@c.FirstName @c.LastName</strong><br />
+                                <small class="text-muted">@c.Email | @c.Phone</small><br />
+                                <small>@c.City</small>
+
+                                <div class="mt-2">
+                                    <button class="btn btn-sm btn-outline-success"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editCustomerModal_@c.CustomerId">
+                                        Edit
+                                    </button>
+
+                                    @using (Html.BeginForm("DeleteCustomer", "Maintain", FormMethod.Post, new { onsubmit = "return confirm('Delete this customer?');", @class = "d-inline" }))
+                                    {
+                                        @Html.AntiForgeryToken()
+                                        @Html.Hidden("customerId", c.CustomerId)
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="p-3 text-muted">No customers found.</p>
+                    }
+                </div>
+
+                <!-- CUSTOMER PAGINATION -->
+                <nav aria-label="Customer pagination" class="mt-2">
+                    <ul class="pagination pagination-sm justify-content-center mb-0">
+                        @{
+                            int cCurrent = ViewBag.CustPage;
+                            int cTotal = Model.PagedCustomers.PageCount;
+                            int cStart = Math.Max(1, cCurrent - 2);
+                            int cEnd = Math.Min(cTotal, cCurrent + 2);
+                        }
+
+                        @if (cCurrent > 1)
+                        {
+                            <li class="page-item"><a class="page-link" href="@Url.Action("Index", new { staffPage = ViewBag.StaffPage, custPage = 1, prodPage = ViewBag.ProdPage })">&laquo;</a></li>
+                            <li class="page-item"><a class="page-link" href="@Url.Action("Index", new { staffPage = ViewBag.StaffPage, custPage = cCurrent - 1, prodPage = ViewBag.ProdPage })">&lt;</a></li>
+                        }
+
+                        @if (cStart > 1)
+                        {
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        }
+
+                        @for (int i = cStart; i <= cEnd; i++)
+                        {
+                            <li class="page-item @(i == cCurrent ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Index", new { staffPage = ViewBag.StaffPage, custPage = i, prodPage = ViewBag.ProdPage })">@i</a>
+                            </li>
+                        }
+
+                        @if (cEnd < cTotal)
+                        {
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        }
+
+                        @if (cCurrent < cTotal)
+                        {
+                            <li class="page-item"><a class="page-link" href="@Url.Action("Index", new { staffPage = ViewBag.StaffPage, custPage = cCurrent + 1, prodPage = ViewBag.ProdPage })">&gt;</a></li>
+                            <li class="page-item"><a class="page-link" href="@Url.Action("Index", new { staffPage = ViewBag.StaffPage, custPage = cTotal, prodPage = ViewBag.ProdPage })">&raquo;</a></li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- PRODUCTS -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-primary text-dark d-flex justify-content-between align-items-center">
+                    <select class="form-select form-select-sm w-auto" onchange="filter('brand', this.value)">
+                        <option value="">Product list</option>
+                        @foreach (var b in Model.Brands)
+                        {
+                            <option value="@b.BrandId" selected="@(b.BrandId == Model.SelectedBrandId)">@b.BrandName</option>
+                        }
+                    </select>
+                    <select class="form-select form-select-sm w-auto ms-2" onchange="filter('category', this.value)">
+                        <option value="">Filter</option>
+                        @foreach (var c in Model.Categories)
+                        {
+                            <option value="@c.CategoryId" selected="@(c.CategoryId == Model.SelectedCategoryId)">@c.CategoryName</option>
+                        }
+                    </select>
+                    <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#createProductModal">Add</button>
+                </div>
+                <div class="card-body">
+                    @if (Model.PagedProducts.Any())
+                    {
+                        foreach (var p in Model.PagedProducts)
+                        {
+                            <div class="border rounded p-2 mb-2">
+                                <strong>@p.ProductName</strong><br />
+                                <small>@p.Brand.BrandName | @p.Category.CategoryName</small><br />
+                                <small class="text-success fw-bold">R @p.ListPrice.ToString("F2")</small>
+
+                                <div class="mt-2">
+                                    <button class="btn btn-sm btn-outline-warning"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editProductModal_@p.ProductId">
+                                        Edit
+                                    </button>
+
+                                    @using (Html.BeginForm("DeleteProduct", "Maintain", FormMethod.Post, new { onsubmit = "return confirm('Delete this product?');", @class = "d-inline" }))
+                                    {
+                                        @Html.AntiForgeryToken()
+                                        @Html.Hidden("productId", p.ProductId)
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted">No products found.</p>
+                    }
+                </div>
+
+                <!-- PRODUCT PAGINATION -->
+                <nav aria-label="Product pagination" class="mt-2">
+                    <ul class="pagination pagination-sm justify-content-center mb-0">
+                        @{
+                            int pCurrent = ViewBag.ProdPage;
+                            int pTotal = Model.PagedProducts.PageCount;
+                            int pStart = Math.Max(1, pCurrent - 2);
+                            int pEnd = Math.Min(pTotal, pCurrent + 2);
+                        }
+
+                        @if (pCurrent > 1)
+                        {
+                            <li class="page-item"><a class="page-link" href="@Url.Action("Index", new { staffPage = ViewBag.StaffPage, custPage = ViewBag.CustPage, prodPage = 1 })">&laquo;</a></li>
+                            <li class="page-item"><a class="page-link" href="@Url.Action("Index", new { staffPage = ViewBag.StaffPage, custPage = ViewBag.CustPage, prodPage = pCurrent - 1 })">&lt;</a></li>
+                        }
+
+                        @if (pStart > 1)
+                        {
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        }
+
+                        @for (int i = pStart; i <= pEnd; i++)
+                        {
+                            <li class="page-item @(i == pCurrent ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Index", new { staffPage = ViewBag.StaffPage, custPage = ViewBag.CustPage, prodPage = i })">@i</a>
+                            </li>
+                        }
+
+                        @if (pEnd < pTotal)
+                        {
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        }
+
+                        @if (pCurrent < pTotal)
+                        {
+                            <li class="page-item"><a class="page-link" href="@Url.Action("Index", new { staffPage = ViewBag.StaffPage, custPage = ViewBag.CustPage, prodPage = pCurrent + 1 })">&gt;</a></li>
+                            <li class="page-item"><a class="page-link" href="@Url.Action("Index", new { staffPage = ViewBag.StaffPage, custPage = ViewBag.CustPage, prodPage = pTotal })">&raquo;</a></li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODALS (Create Only - Edit/Update/Delete via buttons) -->
+<!-- Create Staff Modal -->
+<div class="modal fade" id="createStaffModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            @using (Html.BeginForm("CreateStaff", "Maintain", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Staff</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    @Html.TextBox("FirstName", null, new { @class = "form-control mb-2", placeholder = "First name" })
+                    @Html.TextBox("LastName", null, new { @class = "form-control mb-2", placeholder = "Last name" })
+                    @Html.TextBox("Email", null, new { @class = "form-control mb-2", placeholder = "Email" })
+                    @Html.TextBox("Phone", null, new { @class = "form-control mb-2", placeholder = "Phone" })
+                    @Html.DropDownList("StoreId", new SelectList(Model.Stores, "StoreId", "StoreName"), "Select Store", new { @class = "form-select" })
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Create Customer Modal -->
+<div class="modal fade" id="createCustomerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            @using (Html.BeginForm("CreateCustomer", "Maintain", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Customer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    @Html.TextBox("FirstName", null, new { @class = "form-control mb-2", placeholder = "First name" })
+                    @Html.TextBox("LastName", null, new { @class = "form-control mb-2", placeholder = "Last name" })
+                    @Html.TextBox("Email", null, new { @class = "form-control mb-2", placeholder = "Email" })
+                    @Html.TextBox("Phone", null, new { @class = "form-control mb-2", placeholder = "Phone" })
+                    @Html.TextBox("City", null, new { @class = "form-control mb-2", placeholder = "City" })
+                    @Html.TextBox("ZipCode", null, new { @class = "form-control mb-2", placeholder = "Zip code" })
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Add</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Create Product Modal -->
+<div class="modal fade" id="createProductModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            @using (Html.BeginForm("CreateProduct", "Maintain", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    @Html.TextBox("ProductName", null, new { @class = "form-control mb-2", placeholder = "Product name" })
+                    @Html.DropDownList("BrandId", new SelectList(Model.Brands, "BrandId", "BrandName"), "Select Brand", new { @class = "form-select mb-2" })
+                    @Html.DropDownList("CategoryId", new SelectList(Model.Categories, "CategoryId", "CategoryName"), "Select Category", new { @class = "form-select mb-2" })
+                    @Html.TextBox("ModelYear", null, new { @class = "form-control mb-2", type = "number", placeholder = "Model year" })
+                    @Html.TextBox("ListPrice", null, new { @class = "form-control mb-2", type = "number", step = "0.01", placeholder = "List price" })
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-warning">Add</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modals (existing code) -->
+@foreach (var s in Model.PagedStaffs)
+{
+    <div class="modal fade" id="editStaffModal_@s.StaffId">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                @using (Html.BeginForm("EditStaff", "Maintain", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.Hidden("StaffId", s.StaffId)
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Staff</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        @Html.TextBox("FirstName", s.FirstName, new { @class = "form-control mb-2" })
+                        @Html.TextBox("LastName", s.LastName, new { @class = "form-control mb-2" })
+                        @Html.TextBox("Email", s.Email, new { @class = "form-control mb-2" })
+                        @Html.TextBox("Phone", s.Phone, new { @class = "form-control mb-2" })
+                        @Html.DropDownList("StoreId", new SelectList(Model.Stores, "StoreId", "StoreName", s.StoreId), "Select Store", new { @class = "form-select" })
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Create Customer -->
+@foreach (var c in Model.PagedCustomers)
+{
+    <div class="modal fade" id="editCustomerModal_@c.CustomerId">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                @using (Html.BeginForm("EditCustomer", "Maintain", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.Hidden("CustomerId", c.CustomerId)
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Customer</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        @Html.TextBox("FirstName", c.FirstName, new { @class = "form-control mb-2" })
+                        @Html.TextBox("LastName", c.LastName, new { @class = "form-control mb-2" })
+                        @Html.TextBox("Email", c.Email, new { @class = "form-control mb-2" })
+                        @Html.TextBox("Phone", c.Phone, new { @class = "form-control mb-2" })
+                        @Html.TextBox("City", c.City, new { @class = "form-control mb-2" })
+                        @Html.TextBox("ZipCode", c.ZipCode, new { @class = "form-control mb-2" })
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Update</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Create Product -->
+@foreach (var p in Model.PagedProducts)
+{
+    <div class="modal fade" id="editProductModal_@p.ProductId">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                @using (Html.BeginForm("EditProduct", "Maintain", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.Hidden("ProductId", p.ProductId)
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Product</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        @Html.TextBox("ProductName", p.ProductName, new { @class = "form-control mb-2" })
+                        @Html.DropDownList("BrandId", new SelectList(Model.Brands, "BrandId", "BrandName", p.BrandId), "Select Brand", new { @class = "form-select mb-2" })
+                        @Html.DropDownList("CategoryId", new SelectList(Model.Categories, "CategoryId", "CategoryName", p.CategoryId), "Select Category", new { @class = "form-select mb-2" })
+                        @Html.TextBox("ModelYear", p.ModelYear, new { @class = "form-control mb-2", type = "number" })
+                        @Html.TextBox("ListPrice", p.ListPrice, new { @class = "form-control mb-2", type = "number", step = "0.01" })
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-warning">Update</button>
+                    </div>
+                }
+                </div>
+                }
+            </div>
+        </div>
+        }
+
+        <script>
+            function filter(type, value) {
+                const url = new URL(window.location);
+                if (value) url.searchParams.set(type + 'Id', value);
+                else url.searchParams.delete(type + 'Id');
+                window.location = url;
+            }
+        </script>
+    

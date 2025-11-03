@@ -1,0 +1,321 @@
+﻿@model u22560646_HW3.Models.HomeViewModel
+@{
+    ViewBag.Title = "Home";
+}
+
+<!-- Cover Hero Section -->
+<div class="cover-hero">
+    <div class="cover-overlay"></div>
+    <div class="cover-content text-center">
+        <h1>Where every ride begins</h1>
+        <p>Premium bikes, trusted brands, and unbeatable performance.</p>
+        <a href="@Url.Action("Index", "Maintain")" class="btn btn-primary">Maintain</a>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <div class="row">
+        <!-- STAFF -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <strong>Staff</strong>
+                    <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#createStaffModal">Create</button>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.PagedStaffs != null && Model.PagedStaffs.Any())
+                    {
+                        <table class="table table-sm table-striped mb-0">
+                            <tbody>
+                                @foreach (var s in Model.PagedStaffs)
+                                {
+                                    <tr>
+                                        <td>
+                                            <strong>@s.FirstName @s.LastName</strong><br />
+                                            <small>@s.Email | @s.Phone</small><br />
+                                            <small class="text-muted">ID: @s.StaffId</small>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <p class="p-3 text-muted">No staff found.</p>
+                    }
+                </div>
+
+                <!-- STAFF PAGINATION -->
+                <nav aria-label="Staff pagination" class="mt-2">
+                    <ul class="pagination pagination-sm justify-content-center mb-0">
+                        @{
+                            int current = ViewBag.StaffPage;
+                            int total = Model.PagedStaffs.PageCount;
+                            int start = Math.Max(1, current - 2);
+                            int end = Math.Min(total, current + 2);
+                        }
+
+                        @if (current > 1)
+                        {
+                            <li class="page-item"><a class="page-link" href="@Url.Action("Index", new { staffPage = 1, custPage = ViewBag.CustPage, prodPage = ViewBag.ProdPage })">&laquo;</a></li>
+                            <li class="page-item"><a class="page-link" href="@Url.Action("Index", new { staffPage = current - 1, custPage = ViewBag.CustPage, prodPage = ViewBag.ProdPage })">&lt;</a></li>
+                        }
+
+                        @if (start > 1)
+                        {
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        }
+
+                        @for (int i = start; i <= end; i++)
+                        {
+                            <li class="page-item @(i == current ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Index", new { staffPage = i, custPage = ViewBag.CustPage, prodPage = ViewBag.ProdPage })">@i</a>
+                            </li>
+                        }
+
+                        @if (end < total)
+                        {
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        }
+
+                        @if (current < total)
+                        {
+                            <li class="page-item"><a class="page-link" href="@Url.Action("Index", new { staffPage = current + 1, custPage = ViewBag.CustPage, prodPage = ViewBag.ProdPage })">&gt;</a></li>
+                            <li class="page-item"><a class="page-link" href="@Url.Action("Index", new { staffPage = total, custPage = ViewBag.CustPage, prodPage = ViewBag.ProdPage })">&raquo;</a></li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- CUSTOMERS -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <strong>Customers</strong>
+                    <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#createCustomerModal">Create</button>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.PagedCustomers != null && Model.PagedCustomers.Any())
+                    {
+                        <table class="table table-sm table-striped mb-0">
+                            <tbody>
+                                @foreach (var c in Model.PagedCustomers)
+                                {
+                                    <tr>
+                                        <td>
+                                            <strong>@c.FirstName @c.LastName</strong><br />
+                                            <small>@c.Email | @c.Phone</small><br />
+                                            <small class="text-muted">ID: @c.CustomerId</small>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <p class="p-3 text-muted">No customers found.</p>
+                    }
+                </div>
+
+                <!-- CUSTOMER PAGINATION -->
+                <nav aria-label="Customer pagination" class="mt-2">
+                    <ul class="pagination pagination-sm justify-content-center mb-0">
+                        @{
+                            int cCurrent = ViewBag.CustPage;
+                            int cTotal = Model.PagedCustomers.PageCount;
+                            int cStart = Math.Max(1, cCurrent - 2);
+                            int cEnd = Math.Min(cTotal, cCurrent + 2);
+                        }
+
+                        @if (cCurrent > 1)
+                        {
+                            <li class="page-item"><a class="page-link" href="@Url.Action("Index", new { staffPage = ViewBag.StaffPage, custPage = 1, prodPage = ViewBag.ProdPage })">&laquo;</a></li>
+                            <li class="page-item"><a class="page-link" href="@Url.Action("Index", new { staffPage = ViewBag.StaffPage, custPage = cCurrent - 1, prodPage = ViewBag.ProdPage })">&lt;</a></li>
+                        }
+
+                        @if (cStart > 1)
+                        {
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        }
+
+                        @for (int i = cStart; i <= cEnd; i++)
+                        {
+                            <li class="page-item @(i == cCurrent ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Index", new { staffPage = ViewBag.StaffPage, custPage = i, prodPage = ViewBag.ProdPage })">@i</a>
+                            </li>
+                        }
+
+                        @if (cEnd < cTotal)
+                        {
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        }
+
+                        @if (cCurrent < cTotal)
+                        {
+                            <li class="page-item"><a class="page-link" href="@Url.Action("Index", new { staffPage = ViewBag.StaffPage, custPage = cCurrent + 1, prodPage = ViewBag.ProdPage })">&gt;</a></li>
+                            <li class="page-item"><a class="page-link" href="@Url.Action("Index", new { staffPage = ViewBag.StaffPage, custPage = cTotal, prodPage = ViewBag.ProdPage })">&raquo;</a></li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- PRODUCTS -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-dark d-flex justify-content-between align-items-center">
+                    <div>
+                        <select class="form-select form-select-sm d-inline w-auto" onchange="filterProducts('brand', this.value)">
+                            <option value="">Products</option>
+                            @foreach (var b in Model.Brands)
+                            {
+                                <option value="@b.BrandId" selected="@(b.BrandId == Model.SelectedBrandId)">@b.BrandName</option>
+                            }
+                        </select>
+                        <select class="form-select form-select-sm d-inline w-auto ms-2" onchange="filterProducts('category', this.value)">
+                            <option value="">Filter</option>
+                            @foreach (var c in Model.Categories)
+                            {
+                                <option value="@c.CategoryId" selected="@(c.CategoryId == Model.SelectedCategoryId)">@c.CategoryName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (Model.PagedProducts != null && Model.PagedProducts.Any())
+                    {
+                        foreach (var p in Model.PagedProducts)
+                        {
+                            <div class="border rounded p-2 mb-2">
+                                <strong>@p.ProductName</strong><br />
+                                <small>@p.Brand.BrandName | @p.Category.CategoryName</small><br />
+                                <small class="text-success fw-bold">$@p.ListPrice</small>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted">No products found.</p>
+                    }
+
+                    <div class="text-center mt-3">
+                        <img src="~/Content/Images/Bike.jpg" class="img-fluid rounded" style="height:120px; object-fit:cover;" alt="Bike" />
+                    </div>
+                </div>
+
+                <!-- PRODUCT PAGINATION -->
+                <nav aria-label="Product pagination" class="mt-2">
+                    <ul class="pagination pagination-sm justify-content-center mb-0">
+                        @{
+                            int pCurrent = ViewBag.ProdPage;
+                            int pTotal = Model.PagedProducts.PageCount;
+                            int pStart = Math.Max(1, pCurrent - 2);
+                            int pEnd = Math.Min(pTotal, pCurrent + 2);
+                        }
+
+                        @if (pCurrent > 1)
+                        {
+                            <li class="page-item"><a class="page-link" href="@Url.Action("Index", new { staffPage = ViewBag.StaffPage, custPage = ViewBag.CustPage, prodPage = 1 })">&laquo;</a></li>
+                            <li class="page-item"><a class="page-link" href="@Url.Action("Index", new { staffPage = ViewBag.StaffPage, custPage = ViewBag.CustPage, prodPage = pCurrent - 1 })">&lt;</a></li>
+                        }
+
+                        @if (pStart > 1)
+                        {
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        }
+
+                        @for (int i = pStart; i <= pEnd; i++)
+                        {
+                            <li class="page-item @(i == pCurrent ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Index", new { staffPage = ViewBag.StaffPage, custPage = ViewBag.CustPage, prodPage = i })">@i</a>
+                            </li>
+                        }
+
+                        @if (pEnd < pTotal)
+                        {
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        }
+
+                        @if (pCurrent < pTotal)
+                        {
+                            <li class="page-item"><a class="page-link" href="@Url.Action("Index", new { staffPage = ViewBag.StaffPage, custPage = ViewBag.CustPage, prodPage = pCurrent + 1 })">&gt;</a></li>
+                            <li class="page-item"><a class="page-link" href="@Url.Action("Index", new { staffPage = ViewBag.StaffPage, custPage = ViewBag.CustPage, prodPage = pTotal })">&raquo;</a></li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODALS -->
+<!-- Create Staff Modal -->
+<div class="modal fade" id="createStaffModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            @using (Html.BeginForm("CreateStaff", "Home", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Staff</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    @Html.TextBox("FirstName", null, new { @class = "form-control mb-2", placeholder = "First Name" })
+                    @Html.TextBox("LastName", null, new { @class = "form-control mb-2", placeholder = "Last Name" })
+                    @Html.TextBox("Email", null, new { @class = "form-control mb-2", placeholder = "Email" })
+                    @Html.TextBox("Phone", null, new { @class = "form-control mb-2", placeholder = "Phone" })
+                    @Html.DropDownList("StoreId", new SelectList(Model.Stores, "StoreId", "StoreName"), "Select Store", new { @class = "form-select" })
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Create Customer Modal -->
+<div class="modal fade" id="createCustomerModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            @using (Html.BeginForm("CreateCustomer", "Home", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Customer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    @Html.TextBox("FirstName", null, new { @class = "form-control mb-2", placeholder = "First Name" })
+                    @Html.TextBox("LastName", null, new { @class = "form-control mb-2", placeholder = "Last Name" })
+                    @Html.TextBox("Email", null, new { @class = "form-control mb-2", placeholder = "Email" })
+                    @Html.TextBox("Phone", null, new { @class = "form-control mb-2", placeholder = "Phone" })
+                    @Html.TextBox("City", null, new { @class = "form-control mb-2", placeholder = "City" })
+                    @Html.TextBox("ZipCode", null, new { @class = "form-control", placeholder = "Zip Code" })
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Save</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function filterProducts(type, value) {
+        const url = new URL(window.location);
+        if (type === 'brand') {
+            if (value) url.searchParams.set('brandId', value);
+            else url.searchParams.delete('brandId');
+        } else {
+            if (value) url.searchParams.set('categoryId', value);
+            else url.searchParams.delete('categoryId');
+        }
+        window.location = url;
+    }
+</script>

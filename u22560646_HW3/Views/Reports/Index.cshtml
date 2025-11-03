@@ -1,0 +1,81 @@
+﻿@model u22560646_HW3.Models.PopularProductsViewModel
+@{
+    ViewBag.Title = "Reports - Popular Products";
+}
+<div class="row">
+    <div class="col-12">
+        <h2 class="text-center">Popular Products Report (Top 10)</h2>
+    </div>
+</div>
+
+<div class="row my-3">
+    <div class="col-md-8">
+        <canvas id="popularChart" height="160"></canvas>
+    </div>
+    <div class="col-md-4">
+        <h5>Save Report</h5>
+        @using (Html.BeginForm("SaveReport", "Reports", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            <div class="mb-2">@Html.TextBox("fileName", null, new { @class = "form-control", placeholder = "File name (without extension)" })</div>
+            <div class="mb-2">
+                <select name="fileFormat" class="form-select">
+                    <option value="csv">CSV</option>
+                    <option value="txt">TXT</option>
+                </select>
+            </div>
+            <button class="btn btn-success w-100" type="submit">Save Report</button>
+        }
+        <hr/>
+        <h6>Archive</h6>
+        <table class="table table-sm">
+            <thead class="table-light"><tr><th>File</th><th>Actions</th></tr></thead>
+            <tbody>
+                @foreach (var f in Model.SavedReports)
+                {
+                    <tr>
+                        <td>@f</td>
+                        <td>
+                            <a class="btn btn-success btn-sm" href="@Url.Action("Download","Reports", new { name = f })">Download</a>
+                            @using (Html.BeginForm("Delete", "Reports", FormMethod.Post))
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.Hidden("name", f)
+                                <button class="btn btn-danger btn-sm" type="submit">Delete</button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const items = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Items));
+        const labels = items.map(i => i.ProductName);
+        const data = items.map(i => i.QuantitySold);
+
+        const ctx = document.getElementById('popularChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Quantity Sold',
+                    data: data,
+                    borderWidth: 1,
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    </script>
+}

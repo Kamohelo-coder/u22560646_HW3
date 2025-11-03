@@ -1,0 +1,269 @@
+﻿@model u22560646_HW3.Models.HomeViewModel
+@using PagedList.Mvc
+@using PagedList.EntityFramework
+@{
+    ViewBag.Title = "Home";
+}
+
+<div class="container mt-4">
+    <h2 class="text-center fw-bold mb-4">Staff | Customers | Products</h2>
+
+    <div class="row">
+        <!-- STAFF -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <strong>Staff</strong>
+                    <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#createStaffModal">Create</button>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.PagedStaffs.Any())
+                    {
+                        <table class="table table-sm table-striped mb-0">
+                            <tbody>
+                                @foreach (var s in Model.PagedStaffs)
+                                {
+                                    <tr>
+                                        <td>
+                                            <strong>@s.FirstName @s.LastName</strong><br />
+                                            <small>@s.Email | @s.Phone</small><br />
+                                            <small class="text-muted">ID: @s.StaffId</small>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <p class="p-3 text-muted">No staff found.</p>
+                    }
+                </div>
+                <div class="card-footer bg-light">
+                    <strong>Sold Items</strong>
+                    <ul class="list-unstyled small mb-0">
+                        <li>Sold Item One</li>
+                        <li>Sold Item Two</li>
+                        <li>Sold Item Three</li>
+                        <li class="text-muted">...</li>
+                    </ul>
+                </div>
+                <div class="card-footer text-center">
+                    @Html.PagedListPager(
+          Model.PagedStaffs,
+          page => Url.Action("Index", new
+          {
+              staffPage = page,
+              custPage = ViewBag.CustPage,
+              prodPage = ViewBag.ProdPage,
+              brandId = Model.SelectedBrandId,
+              categoryId = Model.SelectedCategoryId
+          }),
+          new PagedListRenderOptions
+          {
+              LiElementClasses = new[] { "page-item" },
+              UlElementClasses = new[] { "pagination" },
+              DisplayLinkToPreviousPage = PagedListDisplayMode.IfNeeded,
+              DisplayLinkToNextPage = PagedListDisplayMode.IfNeeded
+          }
+)
+                </div>
+            </div>
+        </div>
+
+        <!-- CUSTOMERS -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <strong>Customers</strong>
+                    <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#createCustomerModal">Create</button>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.PagedCustomers.Any())
+                    {
+                        <table class="table table-sm table-striped mb-0">
+                            <tbody>
+                                @foreach (var c in Model.PagedCustomers)
+                                {
+                                    <tr>
+                                        <td>
+                                            <strong>@c.FirstName @c.LastName</strong><br />
+                                            <small>@c.Email | @c.Phone</small><br />
+                                            <small class="text-muted">ID: @c.CustomerId</small>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <p class="p-3 text-muted">No customers found.</p>
+                    }
+                </div>
+                <div class="card-footer bg-light">
+                    <strong>Purchased Items</strong>
+                    <ul class="list-unstyled small mb-0">
+                        <li>Purchased Item One</li>
+                        <li>Purchased Item Two</li>
+                        <li>Purchased Item Three</li>
+                        <li class="text-muted">...</li>
+                    </ul>
+                </div>
+                <div class="card-footer text-center">
+                    @Html.PagedListPager(
+         Model.PagedCustomers,
+         page => Url.Action("Index", new
+         {
+             staffPage = ViewBag.StaffPage,
+             custPage = page,
+             prodPage = ViewBag.ProdPage,
+             brandId = Model.SelectedBrandId,
+             categoryId = Model.SelectedCategoryId
+         }),
+         new PagedListRenderOptions
+         {
+             LiElementClasses = new[] { "page-item" },
+             UlElementClasses = new[] { "pagination" },
+             DisplayLinkToPreviousPage = PagedListDisplayMode.IfNeeded,
+             DisplayLinkToNextPage = PagedListDisplayMode.IfNeeded
+         }
+)
+                </div>
+            </div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+                <div>
+                    <select class="form-select form-select-sm d-inline w-auto" onchange="filterProducts('brand', this.value)">
+                        <option value="">Products</option>
+                        @foreach (var b in Model.Brands)
+                        {
+                            <option value="@b.BrandId" selected="@(b.BrandId == Model.SelectedBrandId)">@b.BrandName</option>
+                        }
+                    </select>
+                    <select class="form-select form-select-sm d-inline w-auto ms-2" onchange="filterProducts('category', this.value)">
+                        <option value="">Filter</option>
+                        @foreach (var c in Model.Categories)
+                        {
+                            <option value="@c.CategoryId" selected="@(c.CategoryId == Model.SelectedCategoryId)">@c.CategoryName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="card-body">
+                @if (Model.PagedProducts.Any())
+                {
+                    foreach (var p in Model.PagedProducts)
+                    {
+                        <div class="border rounded p-2 mb-2">
+                            <strong>@p.ProductName</strong><br />
+                            <small>@p.Brand.BrandName | @p.Category.CategoryName</small><br />
+                            <small class="text-success fw-bold">$@p.ListPrice</small>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-muted">No products found.</p>
+                }
+
+                <div class="text-center mt-3">
+                    <img src="~/Content/Images/Bike.jpg" class="img-fluid rounded" style="height:120px; object-fit:cover;" alt="Bike" />
+                </div>
+            </div>
+            <div class="card-footer text-center">
+                @Html.PagedListPager(
+          Model.PagedProducts,
+          page => Url.Action("Index", new
+          {
+              staffPage = ViewBag.StaffPage,
+              custPage = ViewBag.CustPage,
+              prodPage = page,
+              brandId = Model.SelectedBrandId,
+              categoryId = Model.SelectedCategoryId
+          }),
+          new PagedListRenderOptions
+          {
+              LiElementClasses = new[] { "page-item" },
+              UlElementClasses = new[] { "pagination" },
+              DisplayLinkToPreviousPage = PagedListDisplayMode.IfNeeded,
+              DisplayLinkToNextPage = PagedListDisplayMode.IfNeeded
+          }
+      )
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- MODALS -->
+<!-- Create Staff Modal -->
+<div class="modal fade" id="createStaffModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            @using (Html.BeginForm("CreateStaff", "Home", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Staff</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    @Html.TextBox("FirstName", null, new { @class = "form-control mb-2", placeholder = "First Name" })
+                    @Html.TextBox("LastName", null, new { @class = "form-control mb-2", placeholder = "Last Name" })
+                    @Html.TextBox("Email", null, new { @class = "form-control mb-2", placeholder = "Email" })
+                    @Html.TextBox("Phone", null, new { @class = "form-control mb-2", placeholder = "Phone" })
+                    @Html.DropDownList("StoreId", new SelectList(Model.Stores, "StoreId", "StoreName"), "Select Store", new { @class = "form-select" })
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Create Customer Modal -->
+<div class="modal fade" id="createCustomerModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            @using (Html.BeginForm("CreateCustomer", "Home", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Customer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    @Html.TextBox("FirstName", null, new { @class = "form-control mb-2", placeholder = "First Name" })
+                    @Html.TextBox("LastName", null, new { @class = "form-control mb-2", placeholder = "Last Name" })
+                    @Html.TextBox("Email", null, new { @class = "form-control mb-2", placeholder = "Email" })
+                    @Html.TextBox("Phone", null, new { @class = "form-control mb-2", placeholder = "Phone" })
+                    @Html.TextBox("City", null, new { @class = "form-control mb-2", placeholder = "City" })
+                    @Html.TextBox("ZipCode", null, new { @class = "form-control", placeholder = "Zip Code" })
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Save</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    function filterProducts(type, value) {
+        const url = new URL(window.location);
+        if (type === 'brand') {
+            if (value) url.searchParams.set('brandId', value);
+            else url.searchParams.delete('brandId');
+        } else {
+            if (value) url.searchParams.set('categoryId', value);
+            else url.searchParams.delete('categoryId');
+        }
+        window.location = url;
+    }
+</script>
