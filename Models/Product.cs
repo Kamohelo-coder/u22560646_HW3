@@ -10,17 +10,17 @@ namespace u22560646_HW3.Models
     public class Product
     {
         [Key]
-        public int ProductId { get; set; }         // product_id
+        public int ProductId { get; set; }         
 
         [Required, StringLength(255)]
-        public string ProductName { get; set; }   // product_name
+        public string ProductName { get; set; }   
 
-        public int BrandId { get; set; }          // brand_id
-        public int CategoryId { get; set; }       // category_id
-        public short ModelYear { get; set; }      // model_year
+        public int BrandId { get; set; }          
+        public int CategoryId { get; set; }       
+        public short ModelYear { get; set; }      
 
         [Column(TypeName = "decimal")]
-        public decimal ListPrice { get; set; }    // list_price
+        public decimal ListPrice { get; set; }    
 
         [ForeignKey("BrandId")]
         public virtual Brand Brand { get; set; }

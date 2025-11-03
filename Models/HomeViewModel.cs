@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web;
-using PagedList; // Add this
+using PagedList; 
 
 namespace u22560646_HW3.Models
 {
     public class HomeViewModel
     {
-        // For Maintain page (full lists)
+       
         public List<Staff> Staffs { get; set; }
         public List<Customer> Customers { get; set; }
         public List<Product> Products { get; set; }
@@ -20,11 +20,11 @@ namespace u22560646_HW3.Models
         public List<Category> Categories { get; set; }
         public List<Store> Stores { get; set; }
 
-        // For filtering
+       
         public int? SelectedBrandId { get; set; }
         public int? SelectedCategoryId { get; set; }
 
-        // For Sold/Purchased items
+       
         public Dictionary<int, List<OrderItem>> StaffSoldItems { get; set; }
         public Dictionary<int, List<OrderItem>> CustomerPurchasedItems { get; set; }
     }

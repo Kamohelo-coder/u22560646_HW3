@@ -24,11 +24,11 @@ namespace u22560646_HW3.Models
 
         [Column(TypeName = "decimal")]
         public decimal Discount { get; set; }
-        // Navigation Properties
+      
         public virtual Order Order { get; set; }
         
 
-        // THIS IS THE MISSING LINE
+        
         public virtual Product Product { get; set; }
     }
 }

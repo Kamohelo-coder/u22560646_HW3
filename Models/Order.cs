@@ -26,7 +26,7 @@ namespace u22560646_HW3.Models
 
         public int? StaffId { get; set; }
 
-        // Navigation
+        
         public virtual Customer Customer { get; set; }
         public virtual Staff Staff { get; set; }
         public virtual Store Store { get; set; }

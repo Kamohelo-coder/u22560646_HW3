@@ -29,15 +29,15 @@ namespace u22560646_HW3.Controllers
                 SelectedCategoryId = categoryId
             };
 
-            // Staff
+            
             var staffQuery = db.Staffs.Include(s => s.Store).OrderBy(s => s.LastName);
             vm.PagedStaffs = await staffQuery.ToPagedListAsync(staffPage, pageSize);
 
-            // Customers
+            
             var custQuery = db.Customers.OrderBy(c => c.LastName);
             vm.PagedCustomers = await custQuery.ToPagedListAsync(custPage, pageSize);
 
-            // Products (with filters)
+            
             var prodQuery = db.Products
                 .Include(p => p.Brand)
                 .Include(p => p.Category)
@@ -49,7 +49,7 @@ namespace u22560646_HW3.Controllers
 
             vm.PagedProducts = await prodQuery.ToPagedListAsync(prodPage, pageSize);
 
-            // Load sold/purchased items
+            
             var staffIds = vm.PagedStaffs.Select(s => s.StaffId).ToList();
             var soldItems = await db.OrderItems
                 .Include(oi => oi.Product)
@@ -72,7 +72,7 @@ namespace u22560646_HW3.Controllers
                 .GroupBy(oi => oi.Order.CustomerId.Value)
                 .ToDictionary(g => g.Key, g => g.Take(3).ToList());
 
-            // Page numbers
+            
             ViewBag.StaffPage = staffPage;
             ViewBag.CustPage = custPage;
             ViewBag.ProdPage = prodPage;
@@ -80,7 +80,7 @@ namespace u22560646_HW3.Controllers
             return View(vm);
         }
 
-        // ---- CRUD actions remain the same ----
+        
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<ActionResult> CreateStaff(Staff staff) => await SaveStaff(staff, "added");
 

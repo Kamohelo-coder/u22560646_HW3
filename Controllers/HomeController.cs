@@ -19,12 +19,12 @@ namespace u22560646_HW3.Controllers
         {
             int pageSize = 5;
 
-            // Load dropdown data
+            
             var brands = await db.Brands.OrderBy(b => b.BrandName).ToListAsync();
             var categories = await db.Categories.OrderBy(c => c.CategoryName).ToListAsync();
             var stores = await db.Stores.OrderBy(s => s.StoreName).ToListAsync();
 
-            // Base queries
+            
             var staffQuery = db.Staffs.Include(s => s.Store).OrderBy(s => s.LastName);
             var custQuery = db.Customers.OrderBy(c => c.LastName);
             var prodQuery = db.Products
@@ -32,7 +32,7 @@ namespace u22560646_HW3.Controllers
                 .Include(p => p.Category)
                 .OrderBy(p => p.ProductName);
 
-            // Apply filters
+            
             if (brandId.HasValue)
                 prodQuery = (IOrderedQueryable<Product>)prodQuery.Where(p => p.BrandId == brandId.Value);
             if (categoryId.HasValue)
@@ -52,7 +52,7 @@ namespace u22560646_HW3.Controllers
                 SelectedCategoryId = categoryId
             };
 
-            // Preserve page numbers
+            
             ViewBag.StaffPage = staffPage;
             ViewBag.CustPage = custPage;
             ViewBag.ProdPage = prodPage;
@@ -64,10 +64,10 @@ namespace u22560646_HW3.Controllers
         {
             int pageSize = 5;
 
-            // Load related store data
+            
             var stores = await db.Stores.OrderBy(s => s.StoreName).ToListAsync();
 
-            // Get staff and include store
+          
             var staffQuery = db.Staffs.Include(s => s.Store).OrderBy(s => s.LastName);
 
             var vm = new HomeViewModel

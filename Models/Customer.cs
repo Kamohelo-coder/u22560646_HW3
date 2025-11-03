@@ -18,7 +18,7 @@ namespace u22560646_HW3.Models
         public string City { get; set; }
         public string State { get; set; }
 
-        // Map to DB column zip_code
+        
         [Column("zip_code")]
         public string ZipCode { get; set; }
     }

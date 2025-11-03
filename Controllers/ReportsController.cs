@@ -22,10 +22,10 @@ namespace u22560646_HW3.Controllers
                 Directory.CreateDirectory(reportsPath);
         }
 
-        // GET: Reports
+       
         public async Task<ActionResult> Index()
         {
-            // Popular products: count total quantity sold per product (order_items.quantity)
+            
             var popular = await db.OrderItems
                 .GroupBy(oi => oi.ProductId)
                 .Select(g => new PopularProductItem
@@ -80,7 +80,7 @@ namespace u22560646_HW3.Controllers
                 }
                 else
                 {
-                    // simple plain text format
+                    
                     sw.WriteLine("Popular Products Report");
                     sw.WriteLine("-----------------------");
                     foreach (var p in popular) sw.WriteLine($"{p.ProductName} : {p.QuantitySold}");
